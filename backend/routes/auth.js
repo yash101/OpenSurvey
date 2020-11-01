@@ -1,9 +1,24 @@
 const express = require('express');
+const passport = require('passport');
+const { catch } = require('../app');
 const localStrategy = require('passport-local').Strategy;
 
 const User = require('../database/user');
 
 const router = express.Router();
+
+passport.serializeUser((user, done) => {
+  done(null, user.id);
+});
+
+passport.deserializeUser((id, done) => {
+  try {
+    const user = await User.get(id);
+    this.connect(null, user);
+  } catch(err) {
+    done(err, null);
+  }
+})
 
 router.post('/register', async (req, res, next) => {
   const email = req.body.email;
